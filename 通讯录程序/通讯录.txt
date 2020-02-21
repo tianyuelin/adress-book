@@ -1,0 +1,228 @@
+﻿Record.cpp：
+
+
+#include "Record.h"
+#include "AddressManager.h"
+
+Record::Record(string aName, string aPhone, string aAddress) {
+   m_strName = aName;
+   m_strPhone = aPhone;
+   m_strAddress = aAddress;
+}
+
+void Record::setName(string aName) {
+    m_strName = aName;
+}
+void Record::setPhone(string aPhone) {
+    m_strPhone = aPhone;
+}
+void Record::setAddress(string aAddress) {
+    m_strAddress = aAddress;
+}
+string Record::getName() {
+    return m_strName;
+}
+string Record::getPhone() {
+    return m_strPhone;
+}
+string Record::getAddress() {
+    return m_strAddress;
+}
+
+
+
+
+
+
+
+
+Node.cpp：
+
+
+#include "Node.h"
+
+Node::Node() {
+
+}
+
+void Node::setRecord(Record aR) {
+    m_RecData = aR;
+}
+
+void Node::setNext(Node *aN) {
+    m_Next = aN;
+}
+
+Record Node::getRecord() {
+    return m_RecData;
+}
+
+Node * Node::getNext() {
+    return m_Next;
+}
+
+
+
+
+
+
+
+List.cpp：
+
+
+#include "List.h"
+
+List::List() {
+    m_pHead = new Node();
+    m_pTail = m_pHead;
+    m_iLen = 0;
+}
+
+List::~List() {
+
+}
+
+void List::push(Record r) {
+    Node * a = new Node();
+    a->setRecord(r);
+    a->setNext(NULL);
+    m_pTail->setNext(a);
+    m_pTail = a;
+    m_iLen++;
+}
+
+bool List::remove(int i) {
+    if (i >= m_iLen) return false;
+    Node * p = m_pHead;
+    Node * q = m_pHead->getNext();
+    for (int n = 0; n < i; n++) {
+        p = p->getNext();
+        q = q->getNext();
+    }
+    p->setNext(q->getNext());
+    delete q;
+    m_iLen--;
+    return true;
+}
+
+Record List::at(int i) {
+    Node * p = m_pHead;
+    for (int n = 0; n <= i; n++) {
+        p = p->getNext();
+    }
+    return p->getRecord();
+}
+
+int List::length() {
+    return m_iLen;
+}
+
+
+
+
+
+AddressManager.cpp：
+
+
+#include <iostream>
+#include <string>
+#include "AddressManager.h"
+using namespace std;
+
+void MainInterface();
+List AddressManager::m_Reclist;
+
+void AddressManager::start() {
+    MainInterface();
+    string name, phone, address;
+    Record a;
+    char ope;
+    int k;
+    cin >> ope;
+    switch (ope) {
+    case '1':
+        cout << "[请输入新联系人的姓名]:";
+        cin >> name;
+        cout << "[请输入新联系人的电话]:";
+        cin >> phone;
+        cout << "[请输入新联系人的地址]:";
+        cin >> address;
+        a = Record(name, phone, address);
+        m_Reclist.push(a);
+        cout << "[新联系人添加成功！]\n";
+        fflush(stdin);
+        system("pause");
+        system("cls");
+        start();
+        break;
+    case '2':
+        cout << "[请输入要删除联系人的姓名]：";
+        cin >> name;
+        for (k = 0; k <= m_Reclist.length(); k++) {
+            if (k == m_Reclist.length()) {
+                cout << "[删除的姓名不存在！]\n";
+                break;
+            }
+            if (m_Reclist.at(k).getName() == name) {
+                m_Reclist.remove(k);
+                cout << "[联系人\"" << name << "\"已删除！]\n";
+                break;
+            }
+        }
+        fflush(stdin);
+        system("pause");
+        system("cls");
+        start();
+        break;
+    case '3':
+        cout << "姓名         电话           地址\n";
+        for (int i = 0; i < m_Reclist.length(); i++) {
+            Record disp = m_Reclist.at(i);
+            printf("%-13s%-15s%-s\n", disp.getName().c_str(), disp.getPhone().c_str(), disp.getAddress().c_str());
+        }
+        fflush(stdin);
+        system("pause");
+        system("cls");
+        start();
+        break;
+    case '4':
+        cout << "[请输入要查找联系人的姓名]：";
+        cin >> name;
+        for (k = 0; k < m_Reclist.length(); k++) {
+            if (m_Reclist.at(k).getName() == name) {
+                cout << "[姓名]：" << m_Reclist.at(k).getName() << endl
+                    << "[电话]：" << m_Reclist.at(k).getPhone() << endl
+                    << "[地址]：" << m_Reclist.at(k).getAddress() << endl;
+                break;
+            }
+        }
+        if (k == m_Reclist.length()) cout << "[联系人\"" << name << "\"不存在！]\n";
+        fflush(stdin);
+        system("pause");
+        system("cls");
+        start();
+        break;
+    case '5':
+        exit(0);
+        break;
+    default:
+        cout << "[输入非法请重新输入!]\n";
+        fflush(stdin);
+        system("pause");
+        system("cls");
+        start();
+        break;
+    }
+}
+
+void MainInterface() {
+    cout
+        << "===== 通 讯 录 =====\n"
+        << "  1 [添加记录]\n" 
+        << "  2 [删除记录]\n"
+        << "  3 [浏览记录]\n" 
+        << "  4 [查找记录]\n"
+        << "  5 [退出系统]\n"
+        << "====================\n";
+    cout << "[请选择您要执行的操作]:";
+}
